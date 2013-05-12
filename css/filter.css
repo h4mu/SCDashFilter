@@ -1,0 +1,12 @@
+.authVisible {
+    display: none;
+}
+
+#volume {
+    float: right;
+}
+
+#user {
+    text-align: center;
+    float: center;
+}
