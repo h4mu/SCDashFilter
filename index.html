@@ -27,13 +27,13 @@
   <body>
     <div class="menu authVisible">
         <a href="#" role="button" class="btn btn-mini" id="user" target="_blank"></a>
-        <button role="button" class="btn btn-mini" data-toggle="modal" data-target="#settings">
+        <button role="button" href="settings.html" class="btn btn-mini" data-toggle="modal" data-target="#settings">
             <i class="icon-check"></i> Settings
         </button>
         <button role="button" href="about.html" class="btn btn-mini" data-toggle="modal" data-target="#about">
             <i class="icon-info-sign"></i> About
         </button>
-        <span id="volume">
+        <span id="volume" class="pull-right">
             <i class="icon-volume-off"></i>
             <input class="input-mini" id="range" type="range" min="0" max="100" />
             <i class="icon-volume-up"></i>
@@ -47,16 +47,6 @@
                 <h3 id="myModalLabel">Settings</h3>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label" for="player">Player widget:</label>
-                        <div class="controls">
-                            <select id="player">
-                                <option>SoundCloud HTML 5</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
             </div>
             <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -75,24 +65,24 @@
             </div>
         </div>
         <div id="playerwidget"></div>
-        <form id="filter" class="form-inline" action="javascript:void">
-            <label for="results">Results per page</label>
-            <input type="number" id="results" min="1" max="200" />
-            <label for="results">Sound length</label>
-            <input type="checkbox" id="between" />
-            <label for="between">Between</label>
-            <select id="relation">
-                <option>&lt;</option>
-                <option>=</option>
-                <option>&gt;</option>
-                <option>&lt;&gt;</option>
-            </select>
-            <input type="time" id="shortest" />
-            <label for="longest">and</label>
-            <input type="time" id="longest" />
-            <button class="btn">User blacklist</button>
-            <button type="submit" class="btn btn-primary" autofocus="autofocus">Refresh</button>
-        </form>
+        <!--<form id="filter" class="form-inline" action="javascript:void">-->
+        <!--    <label for="results">Results per page</label>-->
+        <!--    <input type="number" id="results" min="1" max="200" />-->
+        <!--    <label for="results">Sound length</label>-->
+        <!--    <input type="checkbox" id="between" />-->
+        <!--    <label for="between">Between</label>-->
+        <!--    <select id="relation">-->
+        <!--        <option>&lt;</option>-->
+        <!--        <option>=</option>-->
+        <!--        <option>&gt;</option>-->
+        <!--        <option>&lt;&gt;</option>-->
+        <!--    </select>-->
+        <!--    <input type="time" id="shortest" />-->
+        <!--    <label for="longest">and</label>-->
+        <!--    <input type="time" id="longest" />-->
+        <!--    <button class="btn">User blacklist</button>-->
+        <!--    <button type="submit" class="btn btn-primary" autofocus="autofocus">Refresh</button>-->
+        <!--</form>-->
         <div id="sounds"></div>
     </div> <!-- /container -->
 
