@@ -1,13 +1,13 @@
 
-SCFilter.prototype.loadSound = function(url, startPlaying) {
+PropaDash.prototype.loadSound = function(url, startPlaying) {
     SC.Widget($('#playerwidget iframe')[0]).load(url, { auto_play : startPlaying });    
 };
 
-SCFilter.prototype.isShowable = function(activity) {
+PropaDash.prototype.isShowable = function(activity) {
     return activity.origin.streamable && activity.origin.embeddable_by === 'all';
 };
 
-SCFilter.prototype.populateSoundList = function(activities) {
+PropaDash.prototype.populateSoundList = function(activities) {
     if(activities.next_href) {
         this.next_href = activities.next_href;        
     }
@@ -61,7 +61,7 @@ SCFilter.prototype.populateSoundList = function(activities) {
     });
 };
 
-SCFilter.prototype.populateUserButton = function(user) {
+PropaDash.prototype.populateUserButton = function(user) {
     $('.authVisible').show();
     var i = document.createElement('i');
     i.className = 'icon-user';
@@ -72,7 +72,7 @@ SCFilter.prototype.populateUserButton = function(user) {
     .attr('href', user.permalink_url);
 };
 
-SCFilter.prototype.init = function(){
+PropaDash.prototype.init = function(){
     SC.initialize({
       client_id: getSCClientId(),
       redirect_uri: 'https://c9.io/h4mu/scdashfilter/workspace/callback.html'
@@ -85,10 +85,10 @@ SCFilter.prototype.init = function(){
     });
 };
 
-function SCFilter() {
+function PropaDash() {
     var next_href = '';
     var thisObj = this;
     $(document).ready(function () { thisObj.init(); });
 }
 
-new SCFilter();
+new PropaDash();
