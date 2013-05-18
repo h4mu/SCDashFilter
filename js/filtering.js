@@ -1,4 +1,4 @@
-$('#addFilter').click(function() {
+function filterAdd() {
     var filterIndex = $('#filterForm div').length;
     var div = document.createElement('div');
     var delFilter = document.createElement('button');
@@ -8,23 +8,52 @@ $('#addFilter').click(function() {
     div.appendChild(delFilter);
     var fieldSelect = document.createElement('select');
     div.appendChild(fieldSelect);
-    
-});
-
-PropaDashFilter.prototype.getActivityMetadata = function(activities) {
-    // var node = activities.collection;
-    // for (var childName in node) {
-    //     var child = node[childName];
-    //     if (typeof child === typeof node) {
-    //         node = child;
-    //     } else if (child !== null) {
-    //         this.activityMetadata[childName] = typeof child;
-    //     }
-    // }
-};
-
-function PropaDashFilter() {
-    this.activityMetadata = {};
-    var thisObj = this;
-    SC.get('/me/activities', { limit: 20 }, function(activities) { thisObj.getActivityMetadata(activities); });
+    // for ()
+    $('#filterForm').prepend(div);
 }
+
+function getTypes(data, types, nameFractions) {
+    for(var propName in data) {
+		nameFractions.push(propName);
+		var prop = data[propName];
+		if (typeof prop === 'object') {
+			getTypes(prop, types, nameFractions);
+		} else {
+			types[nameFractions.join('.')] = typeof prop;
+		}
+		nameFractions.pop();
+	}
+}
+	
+function parse(data) {
+	var types = {}, nameFractions = [];
+	for(var i = 0; i < data.collection.length; i++) {
+		getTypes(data.collection[i], types, nameFractions);
+	}
+	return types;
+}
+
+function getActivityMetadata(activities) {
+    this.propertyTypes = parse(activities);
+    // for(var propName in result) {
+    //     document.write(propName + ': ' + result[propName] + '<br/>');
+    // } 
+}
+
+function initFiltering() {
+    this.filterProto = {
+        string: {
+            relations: ['matches', 'doesn\'t match']
+        },
+        number: {
+            relations: ['&lt;', '&le;', '=', '&ge;', '&gt;', '&ne;']
+        },
+        boolean: {
+            relations: ['=']
+        }
+    };
+    SC.get('/me/activities', { limit: 20 }, getActivityMetadata);
+    $('#addFilter').click(filterAdd);
+}
+
+initFiltering();

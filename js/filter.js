@@ -1,21 +1,21 @@
 
-PropaDash.prototype.loadSound = function(url, startPlaying) {
+function loadSound(url, startPlaying) {
     SC.Widget($('#playerwidget iframe')[0]).load(url, { auto_play : startPlaying });    
-};
+}
 
-PropaDash.prototype.isShowable = function(activity) {
+function isActivityShowable(activity) {
     return activity.origin.streamable && activity.origin.embeddable_by === 'all';
-};
+}
 
-PropaDash.prototype.populateSoundList = function(activities) {
+function populateSoundList(activities) {
     if(activities.next_href) {
-        this.next_href = activities.next_href;        
+        next_href = activities.next_href;        
     }
     var activityCollection = activities.collection;
     var ul = document.createElement('ul');
     ul.className = 'nav nav-list';
     for (var i = 0; i < activityCollection.length; i++) {
-        if(this.isShowable(activityCollection[i])) {
+        if(isActivityShowable(activityCollection[i])) {
             var origin = activityCollection[i].origin;
             var li = document.createElement('li');
             var a = document.createElement('a');
@@ -27,7 +27,7 @@ PropaDash.prototype.populateSoundList = function(activities) {
         }
     }
     $('#sounds').empty().append(ul);
-    SC.oEmbed($(ul.firstChild).data('uri'), function(oembed) {
+    SC.oEmbed($(ul.firstChild).addClass('active').data('uri'), function(oembed) {
         $('#playerwidget').html(oembed.html);
         var widget = SC.Widget($('#playerwidget iframe')[0]);
         
@@ -53,15 +53,14 @@ PropaDash.prototype.populateSoundList = function(activities) {
         });
     });
 
-    var thisObj = this;
     $('#sounds ul li').dblclick(function() {
-        thisObj.loadSound($(this).data('uri'), true);
+        loadSound($(this).data('uri'), true);
         $('#sounds ul li').removeClass('active');
         $(this).addClass('active');
     });
-};
+}
 
-PropaDash.prototype.populateUserButton = function(user) {
+function renderUserButton(user) {
     $('.authVisible').show();
     var i = document.createElement('i');
     i.className = 'icon-user';
@@ -70,25 +69,19 @@ PropaDash.prototype.populateUserButton = function(user) {
     .append(i)
     .append(document.createTextNode(user.username))
     .attr('href', user.permalink_url);
-};
+}
 
-PropaDash.prototype.init = function(){
+function init(){
     SC.initialize({
       client_id: getSCClientId(),
       redirect_uri: 'https://c9.io/h4mu/scdashfilter/workspace/callback.html'
     });
     
-    var thisObj = this;
     SC.connect(function() {
-        SC.get('/me', function(user) { thisObj.populateUserButton(user); });
-        SC.get('/me/activities', { limit: 50/*, offset: 0*/ }, function(activities) { thisObj.populateSoundList(activities); });
+        SC.get('/me', renderUserButton);
+        SC.get('/me/activities', { limit: 50/*, offset: 0*/ }, populateSoundList);
     });
-};
-
-function PropaDash() {
-    var next_href = '';
-    var thisObj = this;
-    $(document).ready(function () { thisObj.init(); });
 }
 
-new PropaDash();
+var next_href = '';
+$(document).ready(init);
