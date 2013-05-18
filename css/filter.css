@@ -1,3 +1,7 @@
 .authVisible {
     display: none;
 }
+
+div.stringFilter>:not(.stringFilter), div.numberFilter>:not(.numberFilter), div.booleanFilter>:not(.booleanFilter) {
+    display: none;
+}
