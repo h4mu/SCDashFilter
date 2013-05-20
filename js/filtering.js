@@ -1,6 +1,6 @@
 function filterAdd() {
     var div = document.createElement('div');
-    div.className = 'filterDiv stringFilter';
+    div.className = 'stringFilter';     //TODO use 1st elem
     var delFilter = document.createElement('button');
     delFilter.role = 'button';
     delFilter.className = 'btn delFilter stringFilter numberFilter booleanFilter';
@@ -19,7 +19,7 @@ function filterAdd() {
         fieldSelect.appendChild(option);
     }
     $(fieldSelect).change(function() {
-        this.parentNode.className = 'filterDiv ' + propertyTypes[$(this).val()] + 'Filter';
+        this.parentNode.className = propertyTypes[$(this).val()] + 'Filter';
     });
     var relationString = createSelect(['matches', 'doesn\'t match']);
     relationString.className = 'stringFilter';
@@ -42,7 +42,8 @@ function filterAdd() {
     var inputBoolean = createSelect(['false', 'true']);
     inputBoolean.className = 'booleanFilter';
     div.appendChild(inputBoolean);
-    $('#filterForm').prepend(div);
+    $('#filterForm div:last-child').before(div);
+    return div;
 }
 
 function createSelect(items) {
@@ -68,25 +69,62 @@ function getTypes(data, types, nameFractions) {
 	}
 }
 	
-function parse(data) {
-	var types = {}, nameFractions = [];
-	for (var i = 0; i < data.collection.length; i++) {
-		getTypes(data.collection[i], types, nameFractions);
+function getActivityMetadata() {
+    var nameFractions = [], lis = $('#sounds ul li');
+	for (var i = 0; i < lis.length; i++) {
+		getTypes($(lis[i]).data('activity'), propertyTypes, nameFractions);
 	}
-	return types;
 }
 
-function getActivityMetadata(activities) {
-    propertyTypes = parse(activities);
-    // for(var propName in result) {
-    //     document.write(propName + ': ' + result[propName] + '<br/>');
-    // } 
+// GS: \u241D RS: \u241E US: \u241F
+function saveFilters() {
+    var divs = $('#filterForm div'), filters = [];
+    for (var i = 0; i < divs.length; i++) {
+        var div = divs[i];
+        if (div.className) {
+            var filter = [ div.className ];
+            for (var j = 1; j < div.childNodes.length; j++) {
+                var childNode = div.childNodes[j];
+                if (childNode.className.indexOf(div.className) >= 0) {
+                    var value = $(childNode).val();
+                    filter.push(value);
+                }
+            }
+            filters.push(filter.join('\u241F'));
+        }
+    }
+    if (localStorage) {
+        localStorage.SCFilterFilters = filters.join('\u241E');
+    }
+}
+
+function loadFilters() {
+    if (localStorage.SCFilterFilters) {
+        var filters = localStorage.SCFilterFilters.split('\u241E');
+        for (var i = 0; i < filters.length; i++) {
+            var filter = filters[i].split('\u241F'),
+            div = filterAdd(),
+            children = $(div).children('.' + filter[0]);
+            div.className = filter[0];
+            for (var j = 1; j < filter.length && j < children.length; j++) {
+                if (filter[j]) {
+                    $(children[j]).val(filter[j]);
+                }
+            }
+        }
+    }
+}
+
+function saveAndApplyFilters() {
+    saveFilters();
+    applyFilters();
 }
 
 function initFiltering() {
-    // SC.get('/me/activities', { limit: 20 }, getActivityMetadata);
+    getActivityMetadata();
+    loadFilters();
     $('#addFilter').click(filterAdd);
+    $('#filterApply').click(saveAndApplyFilters);
 }
 
-var propertyTypes = {a:'string', b:'number', c:'boolean'};
-initFiltering();
+var propertyTypes = {};
