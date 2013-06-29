@@ -42,7 +42,7 @@ function isHidden(activity, filters) {
 }
 
 function filterActivities(filters) {
-    var lis = $('#sounds ul li');
+    var lis = $('#sounds li');
     for (var i = 0; i < lis.length; i++) {
         var li = $(lis[i]);
         if (isHidden(li.data('activity'), filters)) {
@@ -78,8 +78,7 @@ function populateSoundList(activities) {
         next_href = activities.next_href;        
     }
     var activityCollection = activities.collection;
-    var ul = document.createElement('ul');
-    ul.className = 'nav nav-list';
+    var ul = document.createDocumentFragment();
     for (var i = 0; i < activityCollection.length; i++) {
         var activity = activityCollection[i];
         if(isActivityShowable(activity)) {
@@ -93,41 +92,56 @@ function populateSoundList(activities) {
             ul.appendChild(li);
         }
     }
-    $('#sounds').empty().append(ul);
-    SC.oEmbed($(ul.firstChild).addClass('active').data('activity').origin.uri, function(oembed) {
-        $('#playerwidget').html(oembed.html);
-        var widget = SC.Widget($('#playerwidget iframe')[0]);
-        
-        widget.bind(SC.Widget.Events.READY, function() {
-            widget.getVolume(function(volume) {
-                $('#range').attr({
-                  min: 0,
-                  max: 100
-                })
-                .val(volume)
-                .change(function() {
-                    widget.setVolume($('#range').val());
+    var isFirstCall = $('#sounds li').length <= 0;
+    $('#sounds').append(ul);
+    if(isFirstCall) {
+        SC.oEmbed($('#sounds li:first').addClass('active').data('activity').origin.uri, function(oembed) {
+            $('#playerwidget').html(oembed.html);
+            var widget = SC.Widget($('#playerwidget iframe')[0]);
+            
+            widget.bind(SC.Widget.Events.READY, function() {
+                widget.getVolume(function(volume) {
+                    $('#range').attr({
+                      min: 0,
+                      max: 100
+                    })
+                    .val(volume)
+                    .change(function() {
+                        widget.setVolume($('#range').val());
+                    });
                 });
             });
+            widget.bind(SC.Widget.Events.FINISH, function() {
+                var active = $('li.active');
+                var next = active.next();
+                if(next.length > 0) {
+                    active.removeClass('active');
+                    widget.load(next.addClass('active').data('activity').origin.uri, { auto_play : true });
+                }
+            });
         });
-        widget.bind(SC.Widget.Events.FINISH, function() {
-            var active = $('li.active');
-            var next = active.next();
-            if(next.length > 0) {
-                active.removeClass('active');
-                widget.load(next.addClass('active').data('activity').origin.uri, { auto_play : true });
-            }
-        });
-    });
-
-    $('#sounds ul li').dblclick(function() {
+    }
+    $('#sounds li').dblclick(function() {
         loadSound($(this).data('activity').origin.uri, true);
-        $('#sounds ul li').removeClass('active');
+        $('#sounds li').removeClass('active');
         $(this).addClass('active');
     });
+    $(window).scroll(function() {
+        if($(window).scrollTop() == $(document).height() - $(window).height()) {
+            $('#loading').show();
+            SC.get('/me/activities', { limit: 50, cursor: next_href }, populateSoundList);
+        }
+    });
     
-    if (initFiltering) {
+    if (initFiltering && isFirstCall) {
         initFiltering();
+    }
+    applyFilters();
+    
+    if ($(document).height() <= $(window).height()) {
+        SC.get('/me/activities', { limit: 50, cursor: next_href }, populateSoundList);
+    } else {
+        $('#loading').hide();        
     }
 }
 
