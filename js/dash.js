@@ -157,10 +157,7 @@ function renderUserButton(user) {
 }
 
 function init(){
-    SC.initialize({
-      client_id: getSCClientId(),
-      redirect_uri: 'https://c9.io/h4mu/scdashfilter/workspace/callback.html'
-    });
+    SC.initialize(apidata_init);
     
     SC.connect(function() {
         SC.get('/me', renderUserButton);
