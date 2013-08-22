@@ -70,7 +70,7 @@ function getTypes(data, types, nameFractions) {
 }
 	
 function getActivityMetadata() {
-    var nameFractions = [], lis = $('#sounds ul li');
+    var nameFractions = [], lis = $('#sounds li');
 	for (var i = 0; i < lis.length; i++) {
 		getTypes($(lis[i]).data('activity'), propertyTypes, nameFractions);
 	}
